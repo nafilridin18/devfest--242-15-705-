@@ -1,0 +1,160 @@
+/* ==========================================================================
+   Tender Package Builder - Design Tokens
+   Palette: Peach, Warm Brown, Obsidian Black, Pure White
+   Supports: System & Manual Light / Dark Modes
+   ========================================================================== */
+
+:root {
+  /* ---------------- Base Font System ---------------- */
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-bengali: 'Noto Sans Bengali', 'SolaimanLipi', 'Kalpurush', 'Vrinda', sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', Consolas, Menlo, Monaco, monospace;
+
+  /* ---------------- Light Theme Tokens ---------------- */
+  --color-peach-50: #FFF7F2;
+  --color-peach-100: #FFEFE6;
+  --color-peach-200: #FED7C3;
+  --color-peach-300: #FCBA97;
+  --color-peach-400: #FA9564;
+  --color-peach-500: #F46F36;  /* Primary Peach Accent */
+  --color-peach-600: #DF5319;
+  --color-peach-700: #BA3E0F;
+
+  --color-brown-50: #F9F6F0;
+  --color-brown-100: #EFE8DC;
+  --color-brown-200: #DCCFBA;
+  --color-brown-300: #BCA88D;
+  --color-brown-400: #937B60;
+  --color-brown-500: #6D563D;  /* Rich Warm Brown */
+  --color-brown-600: #55412D;
+  --color-brown-700: #3E2F20;
+  --color-brown-800: #291F15;
+  --color-brown-900: #1B140D;  /* Espresso Black */
+
+  /* Neutral Spectrum */
+  --bg-app: #FAF7F2;
+  --bg-surface: #FFFFFF;
+  --bg-surface-raised: #FFFFFF;
+  --bg-surface-sunken: #F4EFEA;
+  --bg-surface-overlay: rgba(255, 255, 255, 0.88);
+  --bg-tray: #F7F1E8;
+
+  --border-subtle: #EDE4DA;
+  --border-default: #E2D5C7;
+  --border-strong: #C4B29E;
+  --border-focus: #F46F36;
+
+  --text-primary: #1C150F;
+  --text-secondary: #584A3E;
+  --text-muted: #8E7D6F;
+  --text-inverse: #FFFFFF;
+
+  /* Status Badges & Chips */
+  --status-ok-bg: #EAF8EF;
+  --status-ok-border: #9DE0B3;
+  --status-ok-text: #136C38;
+  --status-ok-icon: #19904B;
+
+  --status-missing-bg: #FEEFEF;
+  --status-missing-border: #FCAEAE;
+  --status-missing-text: #B42324;
+  --status-missing-icon: #D92D20;
+
+  --status-expired-bg: #FFF1F0;
+  --status-expired-border: #FFB3AF;
+  --status-expired-text: #B91C1C;
+  --status-expired-icon: #DC2626;
+
+  --status-expiry-needed-bg: #FFF8E6;
+  --status-expiry-needed-border: #FCD67F;
+  --status-expiry-needed-text: #975A16;
+  --status-expiry-needed-icon: #D97706;
+
+  --status-not-provided-bg: #F3EFEA;
+  --status-not-provided-border: #D7CCC0;
+  --status-not-provided-text: #706254;
+  --status-not-provided-icon: #8A7B6E;
+
+  --badge-duplicate-bg: #FEE4E2;
+  --badge-duplicate-border: #FECDCA;
+  --badge-duplicate-text: #912018;
+
+  /* Shadows */
+  --shadow-xs: 0 1px 2px rgba(27, 20, 13, 0.05);
+  --shadow-sm: 0 2px 4px rgba(27, 20, 13, 0.06), 0 1px 2px rgba(27, 20, 13, 0.04);
+  --shadow-md: 0 6px 16px -2px rgba(27, 20, 13, 0.08), 0 2px 6px -1px rgba(27, 20, 13, 0.04);
+  --shadow-lg: 0 12px 28px -4px rgba(27, 20, 13, 0.12), 0 4px 10px -2px rgba(27, 20, 13, 0.06);
+  --shadow-xl: 0 24px 48px -8px rgba(27, 20, 13, 0.18);
+
+  /* Radius */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 22px;
+  --radius-full: 9999px;
+
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 240ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-spring: 320ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* ---------------- Dark Mode Overrides ---------------- */
+[data-theme="dark"] {
+  --bg-app: #0F0C09;
+  --bg-surface: #18130E;
+  --bg-surface-raised: #211B14;
+  --bg-surface-sunken: #130F0B;
+  --bg-surface-overlay: rgba(24, 19, 14, 0.88);
+  --bg-tray: #16110D;
+
+  --border-subtle: #2A2118;
+  --border-default: #3A2E22;
+  --border-strong: #544434;
+  --border-focus: #FA9564;
+
+  --text-primary: #F7EFE9;
+  --text-secondary: #D4C3B2;
+  --text-muted: #958474;
+  --text-inverse: #1C150F;
+
+  --color-peach-500: #FA9564;
+  --color-brown-500: #BCA88D;
+
+  /* Status Badges in Dark Mode */
+  --status-ok-bg: rgba(16, 185, 129, 0.14);
+  --status-ok-border: rgba(16, 185, 129, 0.4);
+  --status-ok-text: #6EE7B7;
+  --status-ok-icon: #34D399;
+
+  --status-missing-bg: rgba(239, 68, 68, 0.15);
+  --status-missing-border: rgba(239, 68, 68, 0.42);
+  --status-missing-text: #FCA5A5;
+  --status-missing-icon: #F87171;
+
+  --status-expired-bg: rgba(225, 29, 72, 0.16);
+  --status-expired-border: rgba(225, 29, 72, 0.44);
+  --status-expired-text: #FDA4AF;
+  --status-expired-icon: #FB7185;
+
+  --status-expiry-needed-bg: rgba(245, 158, 11, 0.15);
+  --status-expiry-needed-border: rgba(245, 158, 11, 0.42);
+  --status-expiry-needed-text: #FCD34D;
+  --status-expiry-needed-icon: #FBBF24;
+
+  --status-not-provided-bg: rgba(120, 113, 108, 0.18);
+  --status-not-provided-border: rgba(120, 113, 108, 0.38);
+  --status-not-provided-text: #D6D3D1;
+  --status-not-provided-icon: #A8A29E;
+
+  --badge-duplicate-bg: rgba(220, 38, 38, 0.22);
+  --badge-duplicate-border: rgba(220, 38, 38, 0.5);
+  --badge-duplicate-text: #FCA5A5;
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.45);
+  --shadow-md: 0 6px 16px -2px rgba(0, 0, 0, 0.55);
+  --shadow-lg: 0 12px 28px -4px rgba(0, 0, 0, 0.65);
+  --shadow-xl: 0 24px 48px -8px rgba(0, 0, 0, 0.8);
+}
