@@ -237,7 +237,7 @@ const activeMatches = [
 ];
 
 const loadedDocs = [];
-let runPage = 3; // Pages 1 and 2 are Cover & Index
+let runPage = 2; // Page 1 is Cover (Content starts directly on Page 2)
 
 for (const m of activeMatches) {
   const bytes = generatedBuffers[m.file];
@@ -270,7 +270,7 @@ const metaList = [
   { label: "Bidder / Contractor:", val: tender.bidder },
   { label: "Submission Deadline:", val: tender.deadline },
   { label: "Generated Date:", val: "2026-10-06 18:20:00 UTC" },
-  { label: "Total Package Pages:", val: `${totalY} Pages (including Cover & Index)` }
+  { label: "Total Package Pages:", val: `${totalY} Pages (including Cover Page)` }
 ];
 
 for (const m of metaList) {
@@ -291,34 +291,6 @@ for (const d of loadedDocs) {
   cover.drawText(`pp. ${d.startPage}–${d.endPage}`, { x: A4_W - 110, y: metaY, size: 9.5, font: fontBold, color: secondaryColor });
   metaY -= 19;
   dNum++;
-}
-
-// 2. Index Page
-const indexP = masterPdf.addPage([A4_W, A4_H]);
-indexP.drawText("DOCUMENT INDEX & SPECIFICATION AUDIT", { x: 50, y: A4_H - 65, size: 16, font: fontBold, color: primaryColor });
-indexP.drawLine({ start: { x: 50, y: A4_H - 78 }, end: { x: A4_W - 50, y: A4_H - 78 }, thickness: 1, color: ruleColor });
-
-let tY = A4_H - 105;
-indexP.drawRectangle({ x: 50, y: tY - 6, width: A4_W - 100, height: 24, color: PDFLib.rgb(0.96, 0.94, 0.91) });
-indexP.drawText("#", { x: 58, y: tY, size: 9, font: fontBold, color: primaryColor });
-indexP.drawText("REQUIREMENT / TITLE", { x: 80, y: tY, size: 9, font: fontBold, color: primaryColor });
-indexP.drawText("FILE NAME", { x: 275, y: tY, size: 9, font: fontBold, color: primaryColor });
-indexP.drawText("PAGES", { x: 420, y: tY, size: 9, font: fontBold, color: primaryColor });
-indexP.drawText("PAGE NO.", { x: 475, y: tY, size: 9, font: fontBold, color: primaryColor });
-tY -= 24;
-
-let rCount = 1;
-for (const d of loadedDocs) {
-  if (rCount % 2 === 1) {
-    indexP.drawRectangle({ x: 50, y: tY - 4, width: A4_W - 100, height: 20, color: PDFLib.rgb(0.99, 0.98, 0.97) });
-  }
-  indexP.drawText(String(d.req.order), { x: 58, y: tY, size: 8.5, font: fontRegular, color: secondaryColor });
-  indexP.drawText(d.req.title_en, { x: 80, y: tY, size: 8.5, font: fontBold, color: primaryColor });
-  indexP.drawText(d.file, { x: 275, y: tY, size: 8.5, font: fontRegular, color: secondaryColor });
-  indexP.drawText(String(d.pageCount), { x: 430, y: tY, size: 8.5, font: fontRegular, color: secondaryColor });
-  indexP.drawText(`${d.startPage} – ${d.endPage}`, { x: 475, y: tY, size: 8.5, font: fontBold, color: primaryColor });
-  tY -= 20;
-  rCount++;
 }
 
 // 3. Append Content Pages with 28pt taller band

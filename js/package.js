@@ -54,9 +54,10 @@ export async function buildTenderPackage(options = {}) {
   }
 
   // 3. Two-pass layout computation
-  // Page 1: Cover Page
-  // Page 2: Document Index / Table of Contents
-  const COVER_PAGES_COUNT = 2;
+  // Page 1: Cover Page (with document summary list and page references)
+  // Optional Bonus Page 2: Separate Extended Index Page
+  const includeIndexPage = Boolean(options.includeIndexPage);
+  const COVER_PAGES_COUNT = includeIndexPage ? 2 : 1;
   let runningPageNumber = COVER_PAGES_COUNT + 1;
 
   for (const doc of loadedDocs) {
@@ -203,69 +204,71 @@ export async function buildTenderPackage(options = {}) {
   }
 
   // ----------------------------------------------------
-  // PASS B: PAGE 2 - TABLE OF CONTENTS / INDEX PAGE (A4)
+  // PASS B: OPTIONAL EXTENDED INDEX PAGE (A4)
   // ----------------------------------------------------
-  const indexPage = masterPdf.addPage([A4_WIDTH, A4_HEIGHT]);
+  if (includeIndexPage) {
+    const indexPage = masterPdf.addPage([A4_WIDTH, A4_HEIGHT]);
 
-  indexPage.drawText("DOCUMENT INDEX & SPECIFICATION AUDIT", {
-    x: 50,
-    y: A4_HEIGHT - 65,
-    size: 16,
-    font: fontBold,
-    color: primaryColor
-  });
+    indexPage.drawText("DOCUMENT INDEX & SPECIFICATION AUDIT", {
+      x: 50,
+      y: A4_HEIGHT - 65,
+      size: 16,
+      font: fontBold,
+      color: primaryColor
+    });
 
-  indexPage.drawLine({
-    start: { x: 50, y: A4_HEIGHT - 78 },
-    end: { x: A4_WIDTH - 50, y: A4_HEIGHT - 78 },
-    thickness: 1,
-    color: ruleColor
-  });
+    indexPage.drawLine({
+      start: { x: 50, y: A4_HEIGHT - 78 },
+      end: { x: A4_WIDTH - 50, y: A4_HEIGHT - 78 },
+      thickness: 1,
+      color: ruleColor
+    });
 
-  // Index Table Header
-  let tableY = A4_HEIGHT - 105;
-  indexPage.drawRectangle({
-    x: 50,
-    y: tableY - 6,
-    width: A4_WIDTH - 100,
-    height: 24,
-    color: PDFLib.rgb(0.96, 0.94, 0.91)
-  });
+    // Index Table Header
+    let tableY = A4_HEIGHT - 105;
+    indexPage.drawRectangle({
+      x: 50,
+      y: tableY - 6,
+      width: A4_WIDTH - 100,
+      height: 24,
+      color: PDFLib.rgb(0.96, 0.94, 0.91)
+    });
 
-  indexPage.drawText("#", { x: 58, y: tableY, size: 9, font: fontBold, color: primaryColor });
-  indexPage.drawText("REQUIREMENT / TITLE", { x: 80, y: tableY, size: 9, font: fontBold, color: primaryColor });
-  indexPage.drawText("FILE NAME", { x: 275, y: tableY, size: 9, font: fontBold, color: primaryColor });
-  indexPage.drawText("PAGES", { x: 420, y: tableY, size: 9, font: fontBold, color: primaryColor });
-  indexPage.drawText("PAGE NO.", { x: 475, y: tableY, size: 9, font: fontBold, color: primaryColor });
+    indexPage.drawText("#", { x: 58, y: tableY, size: 9, font: fontBold, color: primaryColor });
+    indexPage.drawText("REQUIREMENT / TITLE", { x: 80, y: tableY, size: 9, font: fontBold, color: primaryColor });
+    indexPage.drawText("FILE NAME", { x: 275, y: tableY, size: 9, font: fontBold, color: primaryColor });
+    indexPage.drawText("PAGES", { x: 420, y: tableY, size: 9, font: fontBold, color: primaryColor });
+    indexPage.drawText("PAGE NO.", { x: 475, y: tableY, size: 9, font: fontBold, color: primaryColor });
 
-  tableY -= 24;
+    tableY -= 24;
 
-  let rowIdx = 1;
-  for (const doc of loadedDocs) {
-    const isOdd = rowIdx % 2 === 1;
-    if (isOdd) {
-      indexPage.drawRectangle({
-        x: 50,
-        y: tableY - 4,
-        width: A4_WIDTH - 100,
-        height: 20,
-        color: PDFLib.rgb(0.99, 0.98, 0.97)
-      });
+    let rowIdx = 1;
+    for (const doc of loadedDocs) {
+      const isOdd = rowIdx % 2 === 1;
+      if (isOdd) {
+        indexPage.drawRectangle({
+          x: 50,
+          y: tableY - 4,
+          width: A4_WIDTH - 100,
+          height: 20,
+          color: PDFLib.rgb(0.99, 0.98, 0.97)
+        });
+      }
+
+      indexPage.drawText(String(doc.req.order || rowIdx), { x: 58, y: tableY, size: 8.5, font: fontRegular, color: secondaryColor });
+      
+      const rTitle = doc.req.title_en.length > 32 ? doc.req.title_en.substr(0, 30) + '..' : doc.req.title_en;
+      indexPage.drawText(rTitle, { x: 80, y: tableY, size: 8.5, font: fontBold, color: primaryColor });
+
+      const fName = doc.fileMeta.name.length > 24 ? doc.fileMeta.name.substr(0, 22) + '..' : doc.fileMeta.name;
+      indexPage.drawText(fName, { x: 275, y: tableY, size: 8.5, font: fontRegular, color: secondaryColor });
+
+      indexPage.drawText(String(doc.pageCount), { x: 430, y: tableY, size: 8.5, font: fontRegular, color: secondaryColor });
+      indexPage.drawText(`${doc.startPage} – ${doc.endPage}`, { x: 475, y: tableY, size: 8.5, font: fontBold, color: primaryColor });
+
+      tableY -= 20;
+      rowIdx++;
     }
-
-    indexPage.drawText(String(doc.req.order || rowIdx), { x: 58, y: tableY, size: 8.5, font: fontRegular, color: secondaryColor });
-    
-    const rTitle = doc.req.title_en.length > 32 ? doc.req.title_en.substr(0, 30) + '..' : doc.req.title_en;
-    indexPage.drawText(rTitle, { x: 80, y: tableY, size: 8.5, font: fontBold, color: primaryColor });
-
-    const fName = doc.fileMeta.name.length > 24 ? doc.fileMeta.name.substr(0, 22) + '..' : doc.fileMeta.name;
-    indexPage.drawText(fName, { x: 275, y: tableY, size: 8.5, font: fontRegular, color: secondaryColor });
-
-    indexPage.drawText(String(doc.pageCount), { x: 430, y: tableY, size: 8.5, font: fontRegular, color: secondaryColor });
-    indexPage.drawText(`${doc.startPage} – ${doc.endPage}`, { x: 475, y: tableY, size: 8.5, font: fontBold, color: primaryColor });
-
-    tableY -= 20;
-    rowIdx++;
   }
 
   // ----------------------------------------------------

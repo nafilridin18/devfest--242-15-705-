@@ -108,16 +108,25 @@ export function validateRequirementsData(rawData) {
 
   // Tender metadata
   const tender = rawData.tender || {};
-  if (!tender.id || !tender.deadline) {
-    return { valid: false, error: "Missing required tender fields: 'id' and 'deadline' are mandatory." };
+  const tId = String(tender.tender_id || tender.id || '').trim();
+  const tDeadline = String(tender.submission_deadline || tender.deadline || '').trim();
+  const tTitle = String(tender.title || tender.tender_title || 'Untitled Tender').trim();
+  const tEntity = String(tender.procuring_entity || tender.entity || 'Procuring Entity').trim();
+  const tBidder = String(tender.bidder || tender.bidder_name || 'Bidder Organization').trim();
+
+  if (!tId || !tDeadline) {
+    return { valid: false, error: "Missing required tender fields: 'tender_id' and 'submission_deadline' are mandatory." };
   }
 
   const normalizedTender = {
-    id: String(tender.id).trim(),
-    title: String(tender.title || 'Untitled Tender').trim(),
-    entity: String(tender.entity || 'Procuring Entity').trim(),
-    bidder: String(tender.bidder || 'Bidder Organization').trim(),
-    deadline: String(tender.deadline).trim()
+    id: tId,
+    tender_id: tId,
+    title: tTitle,
+    entity: tEntity,
+    procuring_entity: tEntity,
+    bidder: tBidder,
+    deadline: tDeadline,
+    submission_deadline: tDeadline
   };
 
   // Requirements array

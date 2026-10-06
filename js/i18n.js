@@ -64,11 +64,11 @@ export const DICTIONARY = {
     generate_package_btn: "Generate Package PDF",
     generating_pdf: "Assembling Final PDF Package...",
 
-    status_OK: "Ready",
+    status_OK: "OK",
     status_MISSING: "Missing",
-    status_EXPIRY_NEEDED: "Expiry Needed",
+    status_EXPIRY_NEEDED: "Expiry date needed",
     status_EXPIRED: "Expired",
-    status_NOT_PROVIDED: "Not Provided (Optional)",
+    status_NOT_PROVIDED: "Not provided",
 
     toast_sample_loaded: "Sample Tender Pack loaded successfully!",
     toast_matched: "Matched '{file}' to '{req}'",
@@ -141,11 +141,11 @@ export const DICTIONARY = {
     generate_package_btn: "প্যাকেজ PDF তৈরি করুন",
     generating_pdf: "চূড়ান্ত প্যাকেজ তৈরি হচ্ছে...",
 
-    status_OK: "প্রস্তুত",
+    status_OK: "ঠিক আছে",
     status_MISSING: "অনুপস্থিত",
-    status_EXPIRY_NEEDED: "মেয়াদ দিন",
+    status_EXPIRY_NEEDED: "মেয়াদ তারিখ প্রয়োজন",
     status_EXPIRED: "মেয়াদোত্তীর্ণ",
-    status_NOT_PROVIDED: "সংযুক্ত নয় (ঐচ্ছিক)",
+    status_NOT_PROVIDED: "সংযুক্ত নয়",
 
     toast_sample_loaded: "নমুনা টেন্ডার প্যাক সফলভাবে লোড হয়েছে!",
     toast_matched: "'{req}' এর সাথে '{file}' যুক্ত করা হয়েছে",

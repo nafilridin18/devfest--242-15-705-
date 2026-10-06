@@ -143,14 +143,32 @@ async function handleFilesUpload(fileList) {
   }
 
   const processedMeta = [];
+  let addedCount = 0;
+
   for (const file of filesArray) {
+    // 1. Check extension
+    if (!file.name.toLowerCase().endsWith('.pdf')) {
+      showToast(`'${file.name}': Only PDF files are allowed.`, 'error', 4000);
+      continue;
+    }
+
     const { fileMeta, buffer } = await processSingleFile(file, [...state.files, ...processedMeta]);
+
+    // 2. Check Magic Header
+    if (fileMeta.error === 'NOT_PDF') {
+      showToast(`'${file.name}': Rejected, because it doesn't start with %PDF-`, 'error', 4000);
+      continue;
+    }
+
     store.setFileBuffer(fileMeta.id, buffer);
     processedMeta.push(fileMeta);
+    addedCount++;
   }
 
-  store.addFiles(processedMeta);
-  showToast(`Added ${processedMeta.length} file(s) to pool.`, 'success');
+  if (processedMeta.length > 0) {
+    store.addFiles(processedMeta);
+    showToast(`Added ${addedCount} document(s) to pool.`, 'success');
+  }
 }
 
 /**

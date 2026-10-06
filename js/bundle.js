@@ -243,11 +243,11 @@ var TPB = (() => {
       export_csv_btn: "Export Checklist CSV",
       generate_package_btn: "Generate Package PDF",
       generating_pdf: "Assembling Final PDF Package...",
-      status_OK: "Ready",
+      status_OK: "OK",
       status_MISSING: "Missing",
-      status_EXPIRY_NEEDED: "Expiry Needed",
+      status_EXPIRY_NEEDED: "Expiry date needed",
       status_EXPIRED: "Expired",
-      status_NOT_PROVIDED: "Not Provided (Optional)",
+      status_NOT_PROVIDED: "Not provided",
       toast_sample_loaded: "Sample Tender Pack loaded successfully!",
       toast_matched: "Matched '{file}' to '{req}'",
       toast_unmatched: "Unmatched '{file}' from '{req}'",
@@ -311,11 +311,11 @@ var TPB = (() => {
       export_csv_btn: "\u099A\u09C7\u0995\u09B2\u09BF\u09B8\u09CD\u099F CSV \u09A1\u09BE\u0989\u09A8\u09B2\u09CB\u09A1",
       generate_package_btn: "\u09AA\u09CD\u09AF\u09BE\u0995\u09C7\u099C PDF \u09A4\u09C8\u09B0\u09BF \u0995\u09B0\u09C1\u09A8",
       generating_pdf: "\u099A\u09C2\u09A1\u09BC\u09BE\u09A8\u09CD\u09A4 \u09AA\u09CD\u09AF\u09BE\u0995\u09C7\u099C \u09A4\u09C8\u09B0\u09BF \u09B9\u099A\u09CD\u099B\u09C7...",
-      status_OK: "\u09AA\u09CD\u09B0\u09B8\u09CD\u09A4\u09C1\u09A4",
+      status_OK: "\u09A0\u09BF\u0995 \u0986\u099B\u09C7",
       status_MISSING: "\u0985\u09A8\u09C1\u09AA\u09B8\u09CD\u09A5\u09BF\u09A4",
-      status_EXPIRY_NEEDED: "\u09AE\u09C7\u09AF\u09BC\u09BE\u09A6 \u09A6\u09BF\u09A8",
+      status_EXPIRY_NEEDED: "\u09AE\u09C7\u09AF\u09BC\u09BE\u09A6 \u09A4\u09BE\u09B0\u09BF\u0996 \u09AA\u09CD\u09B0\u09AF\u09BC\u09CB\u099C\u09A8",
       status_EXPIRED: "\u09AE\u09C7\u09AF\u09BC\u09BE\u09A6\u09CB\u09A4\u09CD\u09A4\u09C0\u09B0\u09CD\u09A3",
-      status_NOT_PROVIDED: "\u09B8\u0982\u09AF\u09C1\u0995\u09CD\u09A4 \u09A8\u09AF\u09BC (\u0990\u099A\u09CD\u099B\u09BF\u0995)",
+      status_NOT_PROVIDED: "\u09B8\u0982\u09AF\u09C1\u0995\u09CD\u09A4 \u09A8\u09AF\u09BC",
       toast_sample_loaded: "\u09A8\u09AE\u09C1\u09A8\u09BE \u099F\u09C7\u09A8\u09CD\u09A1\u09BE\u09B0 \u09AA\u09CD\u09AF\u09BE\u0995 \u09B8\u09AB\u09B2\u09AD\u09BE\u09AC\u09C7 \u09B2\u09CB\u09A1 \u09B9\u09AF\u09BC\u09C7\u099B\u09C7!",
       toast_matched: "'{req}' \u098F\u09B0 \u09B8\u09BE\u09A5\u09C7 '{file}' \u09AF\u09C1\u0995\u09CD\u09A4 \u0995\u09B0\u09BE \u09B9\u09AF\u09BC\u09C7\u099B\u09C7",
       toast_unmatched: "'{req}' \u09A5\u09C7\u0995\u09C7 \u09AB\u09BE\u0987\u09B2 \u09AC\u09BE\u09A4\u09BF\u09B2 \u0995\u09B0\u09BE \u09B9\u09AF\u09BC\u09C7\u099B\u09C7",
@@ -442,15 +442,23 @@ var TPB = (() => {
       return { valid: false, error: "Invalid JSON structure. Root must be an object." };
     }
     const tender = rawData.tender || {};
-    if (!tender.id || !tender.deadline) {
-      return { valid: false, error: "Missing required tender fields: 'id' and 'deadline' are mandatory." };
+    const tId = String(tender.tender_id || tender.id || "").trim();
+    const tDeadline = String(tender.submission_deadline || tender.deadline || "").trim();
+    const tTitle = String(tender.title || tender.tender_title || "Untitled Tender").trim();
+    const tEntity = String(tender.procuring_entity || tender.entity || "Procuring Entity").trim();
+    const tBidder = String(tender.bidder || tender.bidder_name || "Bidder Organization").trim();
+    if (!tId || !tDeadline) {
+      return { valid: false, error: "Missing required tender fields: 'tender_id' and 'submission_deadline' are mandatory." };
     }
     const normalizedTender = {
-      id: String(tender.id).trim(),
-      title: String(tender.title || "Untitled Tender").trim(),
-      entity: String(tender.entity || "Procuring Entity").trim(),
-      bidder: String(tender.bidder || "Bidder Organization").trim(),
-      deadline: String(tender.deadline).trim()
+      id: tId,
+      tender_id: tId,
+      title: tTitle,
+      entity: tEntity,
+      procuring_entity: tEntity,
+      bidder: tBidder,
+      deadline: tDeadline,
+      submission_deadline: tDeadline
     };
     const rawReqs = rawData.requirements;
     if (!Array.isArray(rawReqs) || rawReqs.length === 0) {
@@ -18956,17 +18964,29 @@ var TPB = (() => {
     const duplicateMatch = existingFiles.find((ef) => ef.hash && ef.hash === hash && ef.name !== name);
     const isDuplicate = Boolean(duplicateMatch);
     const duplicateOf = duplicateMatch ? duplicateMatch.name : null;
+    if (duplicateMatch) {
+      duplicateMatch.isDuplicate = true;
+      duplicateMatch.duplicateOf = name;
+    }
     let pages = 0;
     let loadError = null;
+    let errorMsg = null;
     try {
       const PDFLib = window.PDFLib;
       if (!PDFLib || !PDFLib.PDFDocument) {
         throw new Error("PDFLib library is unavailable");
       }
-      const pdfDoc = await PDFLib.PDFDocument.load(buffer, { ignoreEncryption: true });
+      const pdfDoc = await PDFLib.PDFDocument.load(buffer, { ignoreEncryption: false });
       pages = pdfDoc.getPageCount();
     } catch (err) {
-      loadError = "CORRUPTED";
+      const errStr = String(err?.message || err).toLowerCase();
+      if (errStr.includes("encrypt") || errStr.includes("password")) {
+        loadError = "LOCKED";
+        errorMsg = "Password-protected";
+      } else {
+        loadError = "CORRUPTED";
+        errorMsg = "Cannot be read";
+      }
     }
     let thumbnail = null;
     if (!loadError) {
@@ -18982,7 +19002,7 @@ var TPB = (() => {
         isDuplicate,
         duplicateOf,
         error: loadError,
-        errorMessage: loadError ? "Cannot read PDF (Corrupted or password-protected)" : null,
+        errorMessage: errorMsg,
         thumbnail
       },
       buffer
@@ -19144,7 +19164,7 @@ var TPB = (() => {
       if (!expiryDate) {
         return STATUS_CODES.EXPIRY_NEEDED;
       }
-      const deadline = (state?.tender?.deadline || "").trim();
+      const deadline = (state?.tender?.deadline || state?.tender?.submission_deadline || "").trim();
       if (deadline && expiryDate < deadline) {
         return STATUS_CODES.EXPIRED;
       }
@@ -19184,7 +19204,8 @@ var TPB = (() => {
         // Will compute below
       });
     }
-    const COVER_PAGES_COUNT = 2;
+    const includeIndexPage = Boolean(options.includeIndexPage);
+    const COVER_PAGES_COUNT = includeIndexPage ? 2 : 1;
     let runningPageNumber = COVER_PAGES_COUNT + 1;
     for (const doc of loadedDocs) {
       doc.startPage = runningPageNumber;
@@ -19298,55 +19319,57 @@ var TPB = (() => {
       docIndex++;
       if (metaY < 65) break;
     }
-    const indexPage = masterPdf.addPage([A4_WIDTH, A4_HEIGHT]);
-    indexPage.drawText("DOCUMENT INDEX & SPECIFICATION AUDIT", {
-      x: 50,
-      y: A4_HEIGHT - 65,
-      size: 16,
-      font: fontBold,
-      color: primaryColor
-    });
-    indexPage.drawLine({
-      start: { x: 50, y: A4_HEIGHT - 78 },
-      end: { x: A4_WIDTH - 50, y: A4_HEIGHT - 78 },
-      thickness: 1,
-      color: ruleColor
-    });
-    let tableY = A4_HEIGHT - 105;
-    indexPage.drawRectangle({
-      x: 50,
-      y: tableY - 6,
-      width: A4_WIDTH - 100,
-      height: 24,
-      color: PDFLib.rgb(0.96, 0.94, 0.91)
-    });
-    indexPage.drawText("#", { x: 58, y: tableY, size: 9, font: fontBold, color: primaryColor });
-    indexPage.drawText("REQUIREMENT / TITLE", { x: 80, y: tableY, size: 9, font: fontBold, color: primaryColor });
-    indexPage.drawText("FILE NAME", { x: 275, y: tableY, size: 9, font: fontBold, color: primaryColor });
-    indexPage.drawText("PAGES", { x: 420, y: tableY, size: 9, font: fontBold, color: primaryColor });
-    indexPage.drawText("PAGE NO.", { x: 475, y: tableY, size: 9, font: fontBold, color: primaryColor });
-    tableY -= 24;
-    let rowIdx = 1;
-    for (const doc of loadedDocs) {
-      const isOdd = rowIdx % 2 === 1;
-      if (isOdd) {
-        indexPage.drawRectangle({
-          x: 50,
-          y: tableY - 4,
-          width: A4_WIDTH - 100,
-          height: 20,
-          color: PDFLib.rgb(0.99, 0.98, 0.97)
-        });
+    if (includeIndexPage) {
+      const indexPage = masterPdf.addPage([A4_WIDTH, A4_HEIGHT]);
+      indexPage.drawText("DOCUMENT INDEX & SPECIFICATION AUDIT", {
+        x: 50,
+        y: A4_HEIGHT - 65,
+        size: 16,
+        font: fontBold,
+        color: primaryColor
+      });
+      indexPage.drawLine({
+        start: { x: 50, y: A4_HEIGHT - 78 },
+        end: { x: A4_WIDTH - 50, y: A4_HEIGHT - 78 },
+        thickness: 1,
+        color: ruleColor
+      });
+      let tableY = A4_HEIGHT - 105;
+      indexPage.drawRectangle({
+        x: 50,
+        y: tableY - 6,
+        width: A4_WIDTH - 100,
+        height: 24,
+        color: PDFLib.rgb(0.96, 0.94, 0.91)
+      });
+      indexPage.drawText("#", { x: 58, y: tableY, size: 9, font: fontBold, color: primaryColor });
+      indexPage.drawText("REQUIREMENT / TITLE", { x: 80, y: tableY, size: 9, font: fontBold, color: primaryColor });
+      indexPage.drawText("FILE NAME", { x: 275, y: tableY, size: 9, font: fontBold, color: primaryColor });
+      indexPage.drawText("PAGES", { x: 420, y: tableY, size: 9, font: fontBold, color: primaryColor });
+      indexPage.drawText("PAGE NO.", { x: 475, y: tableY, size: 9, font: fontBold, color: primaryColor });
+      tableY -= 24;
+      let rowIdx = 1;
+      for (const doc of loadedDocs) {
+        const isOdd = rowIdx % 2 === 1;
+        if (isOdd) {
+          indexPage.drawRectangle({
+            x: 50,
+            y: tableY - 4,
+            width: A4_WIDTH - 100,
+            height: 20,
+            color: PDFLib.rgb(0.99, 0.98, 0.97)
+          });
+        }
+        indexPage.drawText(String(doc.req.order || rowIdx), { x: 58, y: tableY, size: 8.5, font: fontRegular, color: secondaryColor });
+        const rTitle = doc.req.title_en.length > 32 ? doc.req.title_en.substr(0, 30) + ".." : doc.req.title_en;
+        indexPage.drawText(rTitle, { x: 80, y: tableY, size: 8.5, font: fontBold, color: primaryColor });
+        const fName = doc.fileMeta.name.length > 24 ? doc.fileMeta.name.substr(0, 22) + ".." : doc.fileMeta.name;
+        indexPage.drawText(fName, { x: 275, y: tableY, size: 8.5, font: fontRegular, color: secondaryColor });
+        indexPage.drawText(String(doc.pageCount), { x: 430, y: tableY, size: 8.5, font: fontRegular, color: secondaryColor });
+        indexPage.drawText(`${doc.startPage} \u2013 ${doc.endPage}`, { x: 475, y: tableY, size: 8.5, font: fontBold, color: primaryColor });
+        tableY -= 20;
+        rowIdx++;
       }
-      indexPage.drawText(String(doc.req.order || rowIdx), { x: 58, y: tableY, size: 8.5, font: fontRegular, color: secondaryColor });
-      const rTitle = doc.req.title_en.length > 32 ? doc.req.title_en.substr(0, 30) + ".." : doc.req.title_en;
-      indexPage.drawText(rTitle, { x: 80, y: tableY, size: 8.5, font: fontBold, color: primaryColor });
-      const fName = doc.fileMeta.name.length > 24 ? doc.fileMeta.name.substr(0, 22) + ".." : doc.fileMeta.name;
-      indexPage.drawText(fName, { x: 275, y: tableY, size: 8.5, font: fontRegular, color: secondaryColor });
-      indexPage.drawText(String(doc.pageCount), { x: 430, y: tableY, size: 8.5, font: fontRegular, color: secondaryColor });
-      indexPage.drawText(`${doc.startPage} \u2013 ${doc.endPage}`, { x: 475, y: tableY, size: 8.5, font: fontBold, color: primaryColor });
-      tableY -= 20;
-      rowIdx++;
     }
     for (const doc of loadedDocs) {
       const pageIndices = doc.srcPdf.getPageIndices();
@@ -20064,13 +20087,25 @@ var TPB = (() => {
       return;
     }
     const processedMeta = [];
+    let addedCount = 0;
     for (const file of filesArray) {
+      if (!file.name.toLowerCase().endsWith(".pdf")) {
+        showToast(`'${file.name}': Only PDF files are allowed.`, "error", 4e3);
+        continue;
+      }
       const { fileMeta, buffer } = await processSingleFile(file, [...state.files, ...processedMeta]);
+      if (fileMeta.error === "NOT_PDF") {
+        showToast(`'${file.name}': Rejected, because it doesn't start with %PDF-`, "error", 4e3);
+        continue;
+      }
       store.setFileBuffer(fileMeta.id, buffer);
       processedMeta.push(fileMeta);
+      addedCount++;
     }
-    store.addFiles(processedMeta);
-    showToast(`Added ${processedMeta.length} file(s) to pool.`, "success");
+    if (processedMeta.length > 0) {
+      store.addFiles(processedMeta);
+      showToast(`Added ${addedCount} document(s) to pool.`, "success");
+    }
   }
   async function loadSamplePack() {
     showToast("Loading Sample Tender Pack...", "info", 1500);

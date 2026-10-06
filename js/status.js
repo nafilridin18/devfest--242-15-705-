@@ -68,7 +68,7 @@ export function computeStatus(req, state) {
       return STATUS_CODES.EXPIRY_NEEDED;
     }
 
-    const deadline = (state?.tender?.deadline || '').trim();
+    const deadline = (state?.tender?.deadline || state?.tender?.submission_deadline || '').trim();
 
     // Strict lexicographical comparison (YYYY-MM-DD)
     // Example: "2026-10-19" < "2026-10-20" -> true (EXPIRED)

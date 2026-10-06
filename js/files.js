@@ -145,18 +145,32 @@ export async function processSingleFile(file, existingFiles = []) {
   const isDuplicate = Boolean(duplicateMatch);
   const duplicateOf = duplicateMatch ? duplicateMatch.name : null;
 
+  if (duplicateMatch) {
+    // Both badged "Duplicate", each names the other
+    duplicateMatch.isDuplicate = true;
+    duplicateMatch.duplicateOf = name;
+  }
+
   // 4. Try parsing PDF and count pages using PDFLib
   let pages = 0;
   let loadError = null;
+  let errorMsg = null;
   try {
     const PDFLib = window.PDFLib;
     if (!PDFLib || !PDFLib.PDFDocument) {
       throw new Error("PDFLib library is unavailable");
     }
-    const pdfDoc = await PDFLib.PDFDocument.load(buffer, { ignoreEncryption: true });
+    const pdfDoc = await PDFLib.PDFDocument.load(buffer, { ignoreEncryption: false });
     pages = pdfDoc.getPageCount();
   } catch (err) {
-    loadError = "CORRUPTED";
+    const errStr = String(err?.message || err).toLowerCase();
+    if (errStr.includes('encrypt') || errStr.includes('password')) {
+      loadError = "LOCKED";
+      errorMsg = "Password-protected";
+    } else {
+      loadError = "CORRUPTED";
+      errorMsg = "Cannot be read";
+    }
   }
 
   // 5. Try thumbnail creation
@@ -175,7 +189,7 @@ export async function processSingleFile(file, existingFiles = []) {
       isDuplicate,
       duplicateOf,
       error: loadError,
-      errorMessage: loadError ? "Cannot read PDF (Corrupted or password-protected)" : null,
+      errorMessage: errorMsg,
       thumbnail
     },
     buffer
