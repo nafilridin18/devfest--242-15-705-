@@ -1,0 +1,92 @@
+{
+  "tender": {
+    "id": "T-2026-0417",
+    "title": "Procurement of IT Infrastructure & Cloud Datacenter Services",
+    "entity": "Ministry of Digital Transformation",
+    "bidder": "Apex Tech Solutions Ltd.",
+    "deadline": "2026-10-20"
+  },
+  "requirements": [
+    {
+      "id": "req-1",
+      "order": 1,
+      "title_en": "Trade License",
+      "title_bn": "ট্রেড লাইসেন্স",
+      "mandatory": true,
+      "has_expiry": true,
+      "description": "Valid Trade License for current fiscal year"
+    },
+    {
+      "id": "req-2",
+      "order": 2,
+      "title_en": "TIN Certificate",
+      "title_bn": "টিআইএন সার্টিফিকেট",
+      "mandatory": true,
+      "has_expiry": false,
+      "description": "Tax Identification Number certificate issued by NBR"
+    },
+    {
+      "id": "req-3",
+      "order": 3,
+      "title_en": "VAT Registration / BIN",
+      "title_bn": "ভ্যাট নিবন্ধন / বিআইএন",
+      "mandatory": true,
+      "has_expiry": false,
+      "description": "Business Identification Number (BIN) registration"
+    },
+    {
+      "id": "req-4",
+      "order": 4,
+      "title_en": "Tax Clearance Certificate",
+      "title_bn": "আয়কর পরিশোধ সনদ",
+      "mandatory": true,
+      "has_expiry": true,
+      "description": "Income tax clearance valid until or past tender deadline"
+    },
+    {
+      "id": "req-5",
+      "order": 5,
+      "title_en": "Bank Solvency Certificate",
+      "title_bn": "ব্যাংক সচ্ছলতা সনদ",
+      "mandatory": true,
+      "has_expiry": true,
+      "description": "Bank solvency certificate issued within last 30 days"
+    },
+    {
+      "id": "req-6",
+      "order": 6,
+      "title_en": "ISO 9001 Certification",
+      "title_bn": "আইএসও ৯০০১ সনদ",
+      "mandatory": false,
+      "has_expiry": true,
+      "description": "Quality management certification (optional evaluation points)"
+    },
+    {
+      "id": "req-7",
+      "order": 7,
+      "title_en": "Manufacturer Authorization Form (MAF)",
+      "title_bn": "প্রস্তুতকারক অনুমোদনের সনদ (MAF)",
+      "mandatory": true,
+      "has_expiry": false,
+      "description": "Direct OEM authorization letter for hardware components"
+    },
+    {
+      "id": "req-8",
+      "order": 8,
+      "title_en": "Audited Financial Statements (Last 3 Years)",
+      "title_bn": "নিরীক্ষিত আর্থিক বিবরণী (বিগত ৩ বছর)",
+      "mandatory": true,
+      "has_expiry": false,
+      "description": "Signed audit reports by chartered accountants"
+    },
+    {
+      "id": "req-9",
+      "order": 9,
+      "title_en": "Similar Contract Experience",
+      "title_bn": "অনুরূপ কাজের অভিজ্ঞতা সনদ",
+      "mandatory": false,
+      "has_expiry": false,
+      "description": "Completion certificates of similar contracts in past 5 years"
+    }
+  ]
+}

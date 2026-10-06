@@ -41,7 +41,7 @@ body {
 .app-container {
   max-width: 1360px;
   margin: 0 auto;
-  padding: 1.5rem 1.25rem 4rem;
+  padding: 1.5rem 1.25rem 7.5rem;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -53,13 +53,12 @@ body {
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
-  padding: 1.25rem 1.75rem;
+  padding: 1.15rem 1.5rem;
   box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
-  position: sticky;
-  top: 1rem;
+  gap: 1rem;
+  position: relative;
   z-index: 40;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -81,8 +80,8 @@ body {
 }
 
 .brand-logo {
-  width: 44px;
-  height: 44px;
+  width: 42px;
+  height: 42px;
   background: linear-gradient(135deg, var(--color-peach-500), var(--color-brown-600));
   border-radius: var(--radius-md);
   display: flex;
@@ -90,13 +89,13 @@ body {
   justify-content: center;
   color: #FFFFFF;
   font-weight: 800;
-  font-size: 1.35rem;
-  box-shadow: var(--shadow-sm);
+  font-size: 1.25rem;
+  box-shadow: 0 4px 12px rgba(244, 111, 54, 0.25);
   flex-shrink: 0;
 }
 
 .brand-text h1 {
-  font-size: 1.35rem;
+  font-size: 1.3rem;
   font-weight: 800;
   letter-spacing: -0.02em;
   color: var(--text-primary);
@@ -106,7 +105,7 @@ body {
 }
 
 .brand-badge {
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -124,7 +123,7 @@ body {
 }
 
 .brand-subtitle {
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   color: var(--text-muted);
 }
 
@@ -132,7 +131,7 @@ body {
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.65rem;
   flex-wrap: wrap;
 }
 
@@ -142,8 +141,8 @@ body {
   justify-content: center;
   gap: 0.45rem;
   font-weight: 600;
-  font-size: 0.88rem;
-  padding: 0.55rem 0.95rem;
+  font-size: 0.85rem;
+  padding: 0.5rem 0.85rem;
   border-radius: var(--radius-sm);
   cursor: pointer;
   border: 1px solid transparent;
@@ -154,7 +153,7 @@ body {
 }
 
 .btn-icon {
-  padding: 0.55rem;
+  padding: 0.5rem;
   border-radius: var(--radius-sm);
   background: var(--bg-surface-sunken);
   border-color: var(--border-default);
@@ -225,31 +224,34 @@ body {
 
 /* ---------------- Step Progress Tracker ---------------- */
 .stepper-bar {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
   padding-top: 0.75rem;
   border-top: 1px solid var(--border-subtle);
+  overflow-x: auto;
 }
 
 .step-item {
   display: flex;
   align-items: center;
-  gap: 0.7rem;
-  padding: 0.5rem 0.75rem;
-  border-radius: var(--radius-sm);
+  gap: 0.65rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: var(--radius-full);
   background: var(--bg-surface-sunken);
-  border: 1px solid transparent;
+  border: 1px solid var(--border-subtle);
   transition: all var(--transition-normal);
+  flex: 1;
 }
 
 .step-item.active {
   background: var(--color-peach-50);
-  border-color: var(--color-peach-300);
+  border-color: var(--color-peach-400);
 }
 [data-theme="dark"] .step-item.active {
-  background: rgba(250, 149, 100, 0.1);
-  border-color: rgba(250, 149, 100, 0.35);
+  background: rgba(250, 149, 100, 0.12);
+  border-color: var(--color-peach-500);
 }
 
 .step-item.completed {
@@ -258,14 +260,14 @@ body {
 }
 
 .step-num {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.75rem;
-  font-weight: 700;
+  font-size: 0.72rem;
+  font-weight: 800;
   background: var(--border-default);
   color: var(--text-secondary);
   flex-shrink: 0;
@@ -283,12 +285,13 @@ body {
 
 .step-info {
   display: flex;
-  flex-direction: column;
+  align-items: baseline;
+  gap: 0.45rem;
   overflow: hidden;
 }
 
 .step-label {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: var(--text-muted);
   text-transform: uppercase;
   font-weight: 700;
@@ -296,12 +299,10 @@ body {
 }
 
 .step-title {
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: 0.82rem;
+  font-weight: 700;
   color: var(--text-primary);
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 /* ---------------- Tender Meta Strip ---------------- */

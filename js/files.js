@@ -80,20 +80,28 @@ export function formatBytes(bytes) {
 export async function generateThumbnail(buffer) {
   try {
     if (!pdfjsLib || !pdfjsLib.getDocument) return null;
-    const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(buffer.slice(0)) });
-    const pdf = await loadingTask.promise;
-    const page = await pdf.getPage(1);
+    const taskPromise = (async () => {
+      const loadingTask = pdfjsLib.getDocument({
+        data: new Uint8Array(buffer.slice(0)),
+        isEvalSupported: false,
+        useWorkerFetch: false
+      });
+      const pdf = await loadingTask.promise;
+      const page = await pdf.getPage(1);
 
-    const viewport = page.getViewport({ scale: 0.25 });
-    const canvas = document.createElement('canvas');
-    canvas.width = viewport.width;
-    canvas.height = viewport.height;
-    const ctx = canvas.getContext('2d');
+      const viewport = page.getViewport({ scale: 0.25 });
+      const canvas = document.createElement('canvas');
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+      const ctx = canvas.getContext('2d');
 
-    await page.render({ canvasContext: ctx, viewport }).promise;
-    return canvas.toDataURL('image/jpeg', 0.7);
+      await page.render({ canvasContext: ctx, viewport }).promise;
+      return canvas.toDataURL('image/jpeg', 0.7);
+    })();
+
+    const timeoutPromise = new Promise(resolve => setTimeout(() => resolve(null), 800));
+    return await Promise.race([taskPromise, timeoutPromise]);
   } catch (err) {
-    // If thumbnail fails (e.g. worker error), fail silently
     return null;
   }
 }
