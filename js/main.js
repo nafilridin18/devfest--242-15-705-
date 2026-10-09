@@ -388,18 +388,102 @@ function initApp() {
     });
   }
 
-  // Generate Package PDF
+  // Helper to convert buffer to base64
+  function bufferToBase64(buffer) {
+    let binary = '';
+    const bytes = new Uint8Array(buffer);
+    const len = bytes.byteLength;
+    for (let i = 0; i < len; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    return window.btoa(binary);
+  }
+
+  // Check Backend Connectivity
+  async function checkBackendConnection() {
+    try {
+      const res = await fetch('/api/health');
+      if (res.ok) {
+        const data = await res.json();
+        store.setState({ backendStatus: { connected: true, version: data.version } });
+        return true;
+      }
+    } catch {
+      // Standalone client mode
+    }
+    store.setState({ backendStatus: { connected: false, version: null } });
+    return false;
+  }
+  checkBackendConnection();
+
+  // Generate Package PDF (Dual: Backend REST API + Client Offline Fallback)
   if (btnGeneratePackage) {
     btnGeneratePackage.addEventListener('click', async () => {
       store.setState({ isGenerating: true });
+      const state = store.getState();
       try {
-        const result = await buildTenderPackage();
-        downloadPdfBlob(result.blob, result.filename);
-        const mb = (result.bytes.byteLength / (1024 * 1024)).toFixed(2);
-        showToast(t('toast_pdf_success', store.getState().lang, { size: mb, pages: result.totalPages }), 'success', 5000);
+        if (state.backendStatus?.connected) {
+          // Assemble via high-performance backend REST API
+          const fileBuffers = {};
+          for (const req of state.requirements) {
+            const fId = state.matches[req.id];
+            if (fId) {
+              const buf = store.getFileBuffer(fId);
+              if (buf) {
+                fileBuffers[fId] = bufferToBase64(buf);
+              }
+            }
+          }
+
+          const payload = {
+            tender: state.tender,
+            requirements: state.requirements,
+            matches: state.matches,
+            expiry: state.expiry,
+            files: state.files,
+            fileBuffers
+          };
+
+          const res = await fetch('/api/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+
+          if (!res.ok) {
+            const errData = await res.json().catch(() => ({}));
+            throw new Error(errData.message || 'Backend compile failed');
+          }
+
+          const genData = await res.json();
+          // Trigger download
+          const a = document.createElement('a');
+          a.href = genData.downloadUrl;
+          a.download = genData.filename;
+          document.body.appendChild(a);
+          a.click();
+          setTimeout(() => document.body.removeChild(a), 150);
+
+          const mb = (genData.bytesLength / (1024 * 1024)).toFixed(2);
+          showToast(t('toast_pdf_success', state.lang, { size: mb, pages: genData.totalPages }) + ` (Saved to output/${genData.filename})`, 'success', 5000);
+        } else {
+          // Standalone client compilation
+          const result = await buildTenderPackage();
+          downloadPdfBlob(result.blob, result.filename);
+          const mb = (result.bytes.byteLength / (1024 * 1024)).toFixed(2);
+          showToast(t('toast_pdf_success', store.getState().lang, { size: mb, pages: result.totalPages }), 'success', 5000);
+        }
       } catch (err) {
-        console.error("PDF Assembly Error:", err);
-        showToast("Error generating package: " + err.message, 'error');
+        console.warn("Backend generate fallback to client:", err);
+        try {
+          const result = await buildTenderPackage();
+          downloadPdfBlob(result.blob, result.filename);
+          const mb = (result.bytes.byteLength / (1024 * 1024)).toFixed(2);
+          showToast(t('toast_pdf_success', store.getState().lang, { size: mb, pages: result.totalPages }), 'success', 5000);
+        } catch (clientErr) {
+          console.error("PDF Assembly Error:", clientErr);
+          showToast("Error generating package: " + clientErr.message, 'error');
+        }
       } finally {
         store.setState({ isGenerating: false });
       }

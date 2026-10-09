@@ -1,0 +1,25 @@
+{
+  "name": "tender-package-builder",
+  "version": "2.0.0",
+  "description": "Enterprise-grade compliant tender dossier compiler and verification backend for Bangladesh e-GP and public procurement standards",
+  "type": "module",
+  "main": "server.mjs",
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node tests/backend-api.test.mjs",
+    "test:unit": "node -e \"import('./js/status.js').then(m => console.table(m.runStatusUnitTests()))\"",
+    "test:judge": "node scripts/make_testpack.mjs",
+    "build:bundle": "node scripts/build-bundle.mjs",
+    "generate:sample": "node scripts/generate-sample-and-output.mjs"
+  },
+  "keywords": [
+    "tender",
+    "egp",
+    "procurement",
+    "pdf-compiler",
+    "compliance",
+    "bangladesh"
+  ],
+  "author": "Nafil Ardul Ridin",
+  "license": "MIT"
+}

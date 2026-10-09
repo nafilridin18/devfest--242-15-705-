@@ -127,6 +127,48 @@ body {
   color: var(--text-muted);
 }
 
+.backend-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-full);
+  background: var(--bg-surface-sunken);
+  border: 1px solid var(--border-default);
+  color: var(--text-secondary);
+  transition: all var(--transition-fast);
+}
+
+.backend-badge.connected {
+  background: var(--status-ok-bg);
+  border-color: var(--status-ok-border);
+  color: var(--status-ok-text);
+}
+
+.backend-badge.standalone {
+  background: var(--color-peach-100);
+  border-color: var(--color-peach-300);
+  color: var(--color-peach-700);
+}
+
+.backend-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #a0aec0;
+}
+
+.backend-badge.connected .backend-dot {
+  background: #19904B;
+  box-shadow: 0 0 6px rgba(25, 144, 75, 0.6);
+}
+
+.backend-badge.standalone .backend-dot {
+  background: var(--color-peach-500);
+}
+
 /* Header Action Controls */
 .header-actions {
   display: flex;

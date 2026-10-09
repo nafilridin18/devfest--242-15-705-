@@ -63,6 +63,12 @@ export function renderHeader(container, state, callbacks = {}) {
       </div>
 
       <div class="header-actions">
+        <!-- Backend API Status Badge -->
+        <div class="backend-badge ${state.backendStatus?.connected ? 'connected' : 'standalone'}" id="backendBadge" title="Backend Server API Status (Port 3000)">
+          <span class="backend-dot"></span>
+          <span id="backendBadgeText">${state.backendStatus?.connected ? 'Backend: Online' : 'Engine: Client'}</span>
+        </div>
+
         <!-- Sample Pack Quick Load -->
         <button class="btn-secondary" id="btnTrySample" style="border-color: var(--color-peach-300);">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>

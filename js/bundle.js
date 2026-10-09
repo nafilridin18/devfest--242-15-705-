@@ -25,7 +25,8 @@ var TPB = (() => {
     // 1:1 mapping: { [reqId]: fileId }
     expiry: {},
     // { [reqId]: 'YYYY-MM-DD' }
-    isGenerating: false
+    isGenerating: false,
+    backendStatus: { connected: false, version: null }
   };
   var StateStore = class {
     constructor() {
@@ -19558,6 +19559,12 @@ var TPB = (() => {
       </div>
 
       <div class="header-actions">
+        <!-- Backend API Status Badge -->
+        <div class="backend-badge ${state.backendStatus?.connected ? "connected" : "standalone"}" id="backendBadge" title="Backend Server API Status (Port 3000)">
+          <span class="backend-dot"></span>
+          <span id="backendBadgeText">${state.backendStatus?.connected ? "Backend: Online" : "Engine: Client"}</span>
+        </div>
+
         <!-- Sample Pack Quick Load -->
         <button class="btn-secondary" id="btnTrySample" style="border-color: var(--color-peach-300);">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
@@ -20270,17 +20277,88 @@ var TPB = (() => {
         e2.target.value = "";
       });
     }
+    function bufferToBase64(buffer) {
+      let binary = "";
+      const bytes = new Uint8Array(buffer);
+      const len = bytes.byteLength;
+      for (let i2 = 0; i2 < len; i2++) {
+        binary += String.fromCharCode(bytes[i2]);
+      }
+      return window.btoa(binary);
+    }
+    async function checkBackendConnection() {
+      try {
+        const res = await fetch("/api/health");
+        if (res.ok) {
+          const data = await res.json();
+          store.setState({ backendStatus: { connected: true, version: data.version } });
+          return true;
+        }
+      } catch {
+      }
+      store.setState({ backendStatus: { connected: false, version: null } });
+      return false;
+    }
+    checkBackendConnection();
     if (btnGeneratePackage) {
       btnGeneratePackage.addEventListener("click", async () => {
         store.setState({ isGenerating: true });
+        const state = store.getState();
         try {
-          const result = await buildTenderPackage();
-          downloadPdfBlob(result.blob, result.filename);
-          const mb = (result.bytes.byteLength / (1024 * 1024)).toFixed(2);
-          showToast(t("toast_pdf_success", store.getState().lang, { size: mb, pages: result.totalPages }), "success", 5e3);
+          if (state.backendStatus?.connected) {
+            const fileBuffers = {};
+            for (const req of state.requirements) {
+              const fId = state.matches[req.id];
+              if (fId) {
+                const buf = store.getFileBuffer(fId);
+                if (buf) {
+                  fileBuffers[fId] = bufferToBase64(buf);
+                }
+              }
+            }
+            const payload = {
+              tender: state.tender,
+              requirements: state.requirements,
+              matches: state.matches,
+              expiry: state.expiry,
+              files: state.files,
+              fileBuffers
+            };
+            const res = await fetch("/api/generate", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload)
+            });
+            if (!res.ok) {
+              const errData = await res.json().catch(() => ({}));
+              throw new Error(errData.message || "Backend compile failed");
+            }
+            const genData = await res.json();
+            const a2 = document.createElement("a");
+            a2.href = genData.downloadUrl;
+            a2.download = genData.filename;
+            document.body.appendChild(a2);
+            a2.click();
+            setTimeout(() => document.body.removeChild(a2), 150);
+            const mb = (genData.bytesLength / (1024 * 1024)).toFixed(2);
+            showToast(t("toast_pdf_success", state.lang, { size: mb, pages: genData.totalPages }) + ` (Saved to output/${genData.filename})`, "success", 5e3);
+          } else {
+            const result = await buildTenderPackage();
+            downloadPdfBlob(result.blob, result.filename);
+            const mb = (result.bytes.byteLength / (1024 * 1024)).toFixed(2);
+            showToast(t("toast_pdf_success", store.getState().lang, { size: mb, pages: result.totalPages }), "success", 5e3);
+          }
         } catch (err) {
-          console.error("PDF Assembly Error:", err);
-          showToast("Error generating package: " + err.message, "error");
+          console.warn("Backend generate fallback to client:", err);
+          try {
+            const result = await buildTenderPackage();
+            downloadPdfBlob(result.blob, result.filename);
+            const mb = (result.bytes.byteLength / (1024 * 1024)).toFixed(2);
+            showToast(t("toast_pdf_success", store.getState().lang, { size: mb, pages: result.totalPages }), "success", 5e3);
+          } catch (clientErr) {
+            console.error("PDF Assembly Error:", clientErr);
+            showToast("Error generating package: " + clientErr.message, "error");
+          }
         } finally {
           store.setState({ isGenerating: false });
         }

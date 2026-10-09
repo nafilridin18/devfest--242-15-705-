@@ -18,7 +18,8 @@ const DEFAULT_STATE = {
   files: [], // Array of { id, name, pages, hash, bytes, arrayBuffer, pdfDoc?, error?, isDuplicate?, duplicateOf? }
   matches: {}, // 1:1 mapping: { [reqId]: fileId }
   expiry: {},  // { [reqId]: 'YYYY-MM-DD' }
-  isGenerating: false
+  isGenerating: false,
+  backendStatus: { connected: false, version: null }
 };
 
 class StateStore {
